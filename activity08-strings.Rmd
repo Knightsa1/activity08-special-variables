@@ -1,14 +1,20 @@
 ---
 title: "Activity 8"
-author: "Name"
+author: "Sara Knight"
 output: github_document
 ---
+
 
 ## Data and packages
 
 Load the entirety of the `{tidyverse}`.
 You will do a little work with dates in this activity so also load `{lubridate}`.
 Be sure to avoid printing out any unnecessary information and give the code chunk a meaningful name.
+
+
+```{r}
+library(tidyverse)
+```
 
 
 
@@ -23,6 +29,9 @@ Notice that this file is a tab-delimited file that is stored as a `.txt` file.
 Therefore, you will need to use either `read_delim` with a `delim = ...` argument or (better) `read_tsv`.
 Assign the file to a meaningful object name, be sure to avoid printing any unnecessary information, and give the code chunk a meaningful name.
 
+```{r}
+billboard <- read_tsv(here::here("data", "billboard_songs.txt"))
+```
 
 
 

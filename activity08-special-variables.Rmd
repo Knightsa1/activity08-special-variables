@@ -1,6 +1,6 @@
 ---
 title: "Activity 8"
-author: "Name"
+author: "Sara Knight"
 output: github_document
 ---
 
@@ -11,7 +11,12 @@ Load the entirety of the `{tidyverse}`.
 If you wish to work with dates during this activity, you will need to also load `{lubridate}`.
 Be sure to avoid printing out any unnecessary information and give the code chunk a meaningful name.
 
+```{r load_library}
 
+library(tidyverse)
+library(lubridate)
+
+```
 
 
 Cheatsheets that you might want to add to your collection:
@@ -25,6 +30,12 @@ Notice that this file is a tab-delimited file that is stored as a `.txt` file.
 Therefore, you will need to use either `read_delim` with a `delim = ...` argument or (better) `read_tsv` .
 Assign the file to a meaningful object name, be sure to avoid printing any unnecessary information, and give the code chunk a meaningful name.
 
+
+```{r load_data}
+
+billboard <- read_tsv(here::here("data","billboard_songs.txt"))
+
+```
 
 
 
@@ -43,10 +54,14 @@ This is a long dataset (34,605 observations)!
 You might like to create a small dataset with only, say, 200 of the rows to try all your code out on the smaller dataset first, and then only run the analysis of the full data after you have experienced everything.
 One way to do this is to use a function like `slice_sample(n = ...)` from `{dplyr}`.
 
-```
+
+```{r Random_200_sample}
+
 # Randomly sample 200 rows
-dataset %>% 
+billboard %>% 
   slice_sample(n = 200)
+
+  
 ```
 
 If you wish to work with `{stringr}`, I find it useful to work on vectors first.
@@ -64,11 +79,56 @@ You are encouraged to explore these data as you wish using functions from the pa
 Some ideas that you might be interested in:
 
 - What 10 songs (display title, artist, and week) were on the charts for the longest?
+
+```{r longest_on_chart}
+weeks <- billboard %>% 
+  pull("weeks on chart")
+
+billboard %>% 
+  arrange(desc(weeks)) %>% 
+  head(n = 10)
+```
 - What distinct date did the oldest song(s) leave the charts?
+
+```{r oldest_songs_leave}
+
+last_date <- billboard %>% 
+  pull("chart date")
+
+billboard %>% 
+  arrange(last_date) %>% 
+  head(n = 4)
+```
+
 - What songs could have been played at your 16th birthday party?
-That is, which songs that eventually peaked at #1  **entered** the charts within a couple months (before or after) your 16th birthday?
-Assuming you were 16 years old by 2015.
+That is, which songs that eventually peaked at #1  **entered** the charts within a couple months (before or after) your 16th birthday? Assuming you were 16 years old by 2015.
+
+```{r sweet_16}
+
+party_songs <- billboard %>% 
+  pull("overall peak")
+
+
+billboard %>% 
+  filter(last_date <= 20061231 , last_date >= 20061201, party_songs == 1) %>% 
+  select("title", "artist", "overall peak", "chart date" )
+ 
+```
+
 - Which artist has been **featured** on the most Billboard charting songs?
+
+```{r artist_most_featured}
+
+featured <- billboard %>% 
+  pull("artist") 
+  
+
+billboard %>% 
+  filter(grepl( "featuring", featured))
+  
+
+```
+
 - Which artist has **collaborated** on the most Billboard charting songs?
 - Create some data visualization controlling the order of the character/string variables.
 
