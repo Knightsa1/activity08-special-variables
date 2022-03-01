@@ -11,12 +11,12 @@ Load the entirety of the `{tidyverse}`.
 You will do a little work with dates in this activity so also load `{lubridate}`.
 Be sure to avoid printing out any unnecessary information and give the code chunk a meaningful name.
 
+```{r load_librar}
 
-```{r}
 library(tidyverse)
+library(lubridate)
+
 ```
-
-
 
 
 Cheatsheets that you might want to add to your collection:
@@ -30,9 +30,10 @@ Therefore, you will need to use either `read_delim` with a `delim = ...` argumen
 Assign the file to a meaningful object name, be sure to avoid printing any unnecessary information, and give the code chunk a meaningful name.
 
 ```{r}
-billboard <- read_tsv(here::here("data", "billboard_songs.txt"))
-```
 
+billboard <- read_tsv(here::here("data", "billboard_songs.txt"))
+
+```
 
 
 These data include information on song popularity.
@@ -55,7 +56,7 @@ This is a long dataset (34,605 observations)!
 When you look at ``chart date`` you'll notice that it was read in as a numeric (`<dbl>`) variable type.
 What does the format of the date appear to be in?
 
-**Response**:
+**Response**: YearDayMonth
 
 
 In this activity, we will be using `str_...` functions to split or find patterns in strings of information.
@@ -65,9 +66,32 @@ Do the following with your dataset:
 - Use `stringr::str_sub` on `date` to create three new columns: `year`, `month`, `day`
 - Replace/overwrite the variable `date` with an updated format using `lubridate::make_date`.
 
+
+```{r breaking_up_the_date}
+
+chart_date <- billboard %>% 
+  pull(`chart date`)
+
+date <- as.character(chart_date)
+
+year <- stringr::str_sub(date, start = 1, end = 4)
+
+month <- stringr::str_sub(date, start = 5, end = 6)
+
+day <- stringr::str_sub(date, start = 7, end = 8)
+
+date <- lubridate::make_date(year, month, day)
+
+```
+
 Once you have verified that this worked, overwrite your data object.
 
+```{r overwrite}
 
+billboard_with_date <- billboard %>% 
+  mutate(`chart date` = date)
+
+```
 
 
 #### Analyzing using dates
@@ -76,18 +100,32 @@ What 10 songs spent the longest on the charts?
 Give only the title, artists, and weeks.
 
 
-
-
 **Response**:
+
+```{r longest_on_chart}
+
+billboard_with_date %>% 
+  arrange(desc(`weeks on chart`)) %>% 
+  select(`title`, `artist`, `weeks on chart`) %>% 
+  head(n = 10)
+
+```
 
 
 What date did the oldest song(s) in this dataset leave the charts?
 Give only the *distinct* dates.
 
 
-
-
 **Response**:
+
+```{r distinct_oldest_songs}
+
+billboard_with_date %>% 
+  arrange(`chart date`) %>% 
+  distinct(`chart date`) %>% 
+  head(n = 10)
+
+```
 
 
 ### Artists who work together
@@ -112,6 +150,13 @@ First, create a vector object called `artist_credentials` that takes your datase
 The `pull` function is like `select` except that it outputs a vector rather than a data frame (tibble).
 Using this function will help us avoid many "`coercing`" warnings - I find it easier to work with vectors of strings.
 
+```{r artist_credentials}
+
+artist_credentials <- billboard_with_date %>% 
+  pull(artist)
+
+```
+
 Using the `artist_credentials` vector, do the following. I recommend that you do one bullet at time and verify that it worked.
 
 - Use `str_subset` to pick only the observations that only include `"featuring"`,*then*
@@ -120,17 +165,40 @@ Using the `artist_credentials` vector, do the following. I recommend that you do
 - Use `unlist` to lengthen all featured artists into one vector (compare the output here to the output from the previous bullet point), *then*
 - Use `str_trim` to remove whitespace from `"both"` sides of each entry.
 
+
+
+```{r artist_featuring}
+
+featuring <-  artist_credentials %>% 
+  str_subset("featuring") %>% 
+  str_replace_all(".+ featuring", "") %>% 
+  str_split(",|&| or | and ") %>% 
+  unlist() %>% 
+  str_trim()
+
+```
+
+
 When you verify that this works, save this information into an object called `feat_artist`.
 
+```{r}
+feat_artist <- featuring
+
+```
 
 
 
 Now you can use this information to answer the question above.
 
 
+**Response**: Lil Wayne
 
+```{r most_featured_Artist}
 
-**Response**:
+as.data.frame(table(feat_artist)) %>% 
+  arrange(desc(Freq)) %>% 
+  head(n = 1)
+```
 
 
 Which artist has **collaborated** on the most Billboard charting songs?
@@ -142,15 +210,35 @@ Using the `artist_credentials` vector you created before, do the following:
 - Use `unlist` to lengthen all collaborating artists into one vector, *then*
 - Use `str_trim` to remove whitespace from `"both"` sides of each entry.
 
+```{r artist_credentials_collab}
+
+artist_collab <- artist_credentials %>% 
+   str_replace_all(" featuring.+" , "") %>%
+   str_replace_all(" feat.+", "") %>% 
+   str_split(",|&") %>% 
+   unlist() %>% 
+   str_trim()
+
+```
+
+
 When you verify that this works, save this information into an object called `collab_artist`.
 
+```{r}
+collab_artist <- artist_collab
+```
 
 
+Now you can use this information to answer the question artist.
 
-Now you can use this information to answer the question above.
+```{r most_collaborated_artist}
 
+as.data.frame(table(collab_artist)) %>% 
+  arrange(desc(Freq)) %>% 
+  head(n = 1)
+```
 
-
+**Response:** Glee Cast
 
 #### Challenge 1
 

@@ -91,18 +91,18 @@ billboard %>%
 ```
 
     ## # A tibble: 200 x 5
-    ##    title          artist            `overall peak` `weeks on chart` `chart date`
-    ##    <chr>          <chr>                      <dbl>            <dbl>        <dbl>
-    ##  1 Nickel Song    THE NEW SEEKERS …             81                2     19710320
-    ##  2 Cheers (Drink… RIHANNA                        7               18     20111210
-    ##  3 Google Eye     THE NASHVILLE TE…            117                3     19641226
-    ##  4 Miami          WILL SMITH                    17               21     19990424
-    ##  5 Love's Comin'… MELBA MOORE                  104                4     19821127
-    ##  6 After All We'… MAXINE BROWN                 114                1     19611127
-    ##  7 Iko Iko        THE DIXIE CUPS                20               10     19650605
-    ##  8 True To You    RIC OCASEK                    75                8     19870207
-    ##  9 The Weight     JACKIE DeSHANNON              55               10     19681012
-    ## 10 How Can I For… ELISA FIORILLO                60                8     19880312
+    ##    title           artist           `overall peak` `weeks on chart` `chart date`
+    ##    <chr>           <chr>                     <dbl>            <dbl>        <dbl>
+    ##  1 My Hero         BLUE NOTES                   78                4     19601024
+    ##  2 Lady Willpower  GARY PUCKETT AN…              2               13     19680831
+    ##  3 I Never Picked… ROY CLARK                   122                1     19700612
+    ##  4 The Bears       THE FASTEST GRO…            133                1     19661126
+    ##  5 The Love Parade DREAM ACADEMY                36               11     19860628
+    ##  6 Music, Music, … THE SENSATIONS               54                2     19610814
+    ##  7 We're All In T… WEST COAST RAP …             35               16     19901006
+    ##  8 To Each His Own THE PLATTERS                 21               12     19601219
+    ##  9 Don't Go Away   FUN FACTORY                  93                4     19961123
+    ## 10 I'll Take You … GENERAL PUBLIC               22               20     19940820
     ## # … with 190 more rows
 
 If you wish to work with `{stringr}`, I find it useful to work on
@@ -174,32 +174,42 @@ party_songs <- billboard %>%
 
 
 billboard %>% 
-  filter(last_date <= 20061231 , last_date >= 20061201) %>%
-  filter("overall peak" >= 1)
+  filter(last_date <= 20061231 , last_date >= 20061201, party_songs == 1) %>% 
+  select("title", "artist", "overall peak", "chart date" )
 ```
 
-    ## # A tibble: 33 x 5
-    ##    title           artist           `overall peak` `weeks on chart` `chart date`
-    ##    <chr>           <chr>                     <dbl>            <dbl>        <dbl>
-    ##  1 The Carpal Tun… FALL OUT BOY                 81                1     20061230
-    ##  2 Chain Hang Low  JIBBS                         7               20     20061230
-    ##  3 Let's Ride      THE GAME                     46                5     20061230
-    ##  4 I'll Be Home F… JOSH GROBAN                  95                1     20061230
-    ##  5 Get Up          CIARA featuring…              7               20     20061223
-    ##  6 London Bridge   FERGIE                        1               21     20061223
-    ##  7 Mountains       LONESTAR                     77                9     20061223
-    ##  8 Tu Recuerdo     RICKY MARTIN fe…             89                2     20061223
-    ##  9 The Diary Of J… BREAKING BENJAM…             50               20     20061223
-    ## 10 Give It Away    GEORGE STRAIT                35               19     20061223
-    ## # … with 23 more rows
-
-``` r
-#billboard_in_2006 %>% 
-#  filter(party_songs == 1)
-```
+    ## # A tibble: 1 x 4
+    ##   title         artist `overall peak` `chart date`
+    ##   <chr>         <chr>           <dbl>        <dbl>
+    ## 1 London Bridge FERGIE              1     20061223
 
 -   Which artist has been **featured** on the most Billboard charting
     songs?
+
+``` r
+featured <- billboard %>% 
+  pull("artist") 
+  
+
+billboard %>% 
+  filter(grepl( "featuring", featured))
+```
+
+    ## # A tibble: 1,527 x 5
+    ##    title       artist               `overall peak` `weeks on chart` `chart date`
+    ##    <chr>       <chr>                         <dbl>            <dbl>        <dbl>
+    ##  1 Uptown Fun… MARK RONSON featuri…              1               15     20150307
+    ##  2 I Don't Mi… USHER featuring JUI…             13               14     20150307
+    ##  3 Only        NICKI MINAJ featuri…             12               17     20150307
+    ##  4 Truffle Bu… NICKI MINAJ featuri…             17                5     20150307
+    ##  5 She Knows   NE-YO featuring JUI…             22               13     20150307
+    ##  6 I Don't Fu… BIG SEAN featuring …             11               22     20150307
+    ##  7 Somebody    NATALIE LA ROSE fea…             27                5     20150307
+    ##  8 G.D.F.R.    FLO RIDA featuring …             28               12     20150307
+    ##  9 Outside     CALVIN HARRIS featu…             42                8     20150307
+    ## 10 Lonely Ton… BLAKE SHELTON featu…             47               12     20150307
+    ## # … with 1,517 more rows
+
 -   Which artist has **collaborated** on the most Billboard charting
     songs?
 -   Create some data visualization controlling the order of the
